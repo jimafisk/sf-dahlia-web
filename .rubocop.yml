@@ -12,6 +12,7 @@ AllCops:
     - 'node_modules/**/*'
     - 'config/environments/production.rb'
     - 'config/initializers/devise.rb'
+    - 'logs_to_csv.rb'
 
 # We don't care about method length, since we check method cyclomatic
 # complexity.
