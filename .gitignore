@@ -30,3 +30,6 @@ lib/assets/bower_components
 ssl.sh
 certs
 public/sitemap*
+
+# Ignore generated test coverage
+coverage/

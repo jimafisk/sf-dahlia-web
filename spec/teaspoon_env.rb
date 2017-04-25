@@ -157,16 +157,16 @@ Teaspoon.configure do |config|
   # Specify that you always want a coverage configuration to be used. Otherwise, specify that you want coverage
   # on the CLI.
   # Set this to "true" or the name of your coverage config.
-  #config.use_coverage = nil
+  config.use_coverage = false
 
   # You can have multiple coverage configs by passing a name to config.coverage.
   # e.g. config.coverage :ci do |coverage|
   # The default coverage config name is :default.
-  config.coverage do |coverage|
+  config.coverage :text do |coverage|
     # Which coverage reports Istanbul should generate. Correlates directly to what Istanbul supports.
     #
     # Available: text-summary, text, html, lcov, lcovonly, cobertura, teamcity
-    #coverage.reports = ["text-summary", "html"]
+    coverage.reports = ['text']
 
     # The path that the coverage should be written to - when there's an artifact to write to disk.
     # Note: Relative to `config.root`.
@@ -174,7 +174,13 @@ Teaspoon.configure do |config|
 
     # Assets to be ignored when generating coverage reports. Accepts an array of filenames or regular expressions. The
     # default excludes assets from vendor, gems and support libraries.
-    #coverage.ignore = [%r{/lib/ruby/gems/}, %r{/vendor/assets/}, %r{/support/}, %r{/(.+)_helper.}]
+    coverage.ignore = [
+      %r{/lib/ruby/gems/},
+      %r{/lib/assets/},
+      %r{/vendor/assets/},
+      %r{/support/},
+      %r{/(.+)_helper.}
+    ]
 
     # Various thresholds requirements can be defined, and those thresholds will be checked at the end of a run. If any
     # aren't met the run will fail with a message. Thresholds can be defined as a percentage (0-100), or nil.
@@ -182,5 +188,17 @@ Teaspoon.configure do |config|
     #coverage.functions = nil
     #coverage.branches = nil
     #coverage.lines = nil
+  end
+
+  config.coverage :ci do |coverage|
+    coverage.reports = ['lcovonly']
+
+    coverage.ignore = [
+      %r{/lib/ruby/gems/},
+      %r{/lib/assets/},
+      %r{/vendor/assets/},
+      %r{/support/},
+      %r{/(.+)_helper.}
+    ]
   end
 end
