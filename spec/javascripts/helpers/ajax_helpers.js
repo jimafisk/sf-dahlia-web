@@ -1,4 +1,6 @@
-'user strict';
+'use strict';
+
+jasmine.getJSONFixtures().fixturesPath = '/teaspoon/fixtures'
 
 function stubAjaxRequestWithData(requestURL, data, status) {
   jasmine.Ajax.stubRequest(requestURL)
