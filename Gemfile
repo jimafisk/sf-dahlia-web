@@ -92,6 +92,7 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem 'awesome_print'
   gem 'dotenv-rails'
+  gem 'jquery-rails' # only needed for jasmine-jquery
   gem 'teaspoon-jasmine'
   gem 'jasmine-jquery-rails' # used for functions like `getJSONFixture`
   gem 'phantomjs', '~> 2.1.1'
