@@ -5,7 +5,7 @@ html lang="en"
   /! <![endif]
   head
     title DAHLIA San Francisco Housing Portal
-    = stylesheet_link_tag 'application', media: 'all'
+    / = stylesheet_link_tag 'application', media: 'all'
     meta http-equiv="X-UA-Compatible" content="IE=edge"
     meta charset="utf-8"
     meta name="viewport" content="width=device-width, initial-scale=1"
@@ -51,3 +51,15 @@ html lang="en"
 
     = javascript_include_tag 'application', async: Rails.env.production?
     = yield :javascript
+
+    javascript:
+      var styleSheet = document.createElement("link")
+      styleSheet.rel = 'stylesheet'
+      styleSheet.media = 'all'
+      styleSheet.href = '#{stylesheet_path("application")}'
+      styleSheet.onload = function() {
+        var topBar = document.getElementById('nav-top-bar')
+        var topBarRow = document.getElementById('nav-top-bar-row')
+        topBar.style.height = topBarRow.offsetHeight + 'px'
+      }
+      document.getElementsByTagName("head")[0].appendChild(styleSheet)
