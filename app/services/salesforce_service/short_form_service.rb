@@ -30,23 +30,31 @@ module SalesforceService
       api_delete("/shortForm/delete/#{id}")
     end
 
-    def self.attach_file(application, file, filename)
+    def self.attach_file(opts = {})
+      file = opts[:file]
+      filename = file.descriptive_name
       headers = { Name: filename, 'Content-Type' => file.content_type }
-      endpoint = "/shortForm/Attachment/#{application['id']}"
+      endpoint = "/shortForm/Attachment/#{opts[:application_id]}"
       body = {
         fileName: filename,
         DocumentType: file.document_type,
         Body: Base64.encode64(file.file),
-        ApplicationId: application['id'],
-        ApplicationMemberID: _short_form_pref_member_id(application, file),
-        ApplicationPreferenceID: _short_form_pref_id(application, file),
+        ApplicationId: opts[:application_id],
+        ApplicationMemberID: opts[:application_member_id],
+        ApplicationPreferenceID: opts[:application_preference_id],
       }
       api_post_with_headers(endpoint, body, headers)
     end
 
-    def self.attach_files(application, files)
+    def self.queue_file_attachments(application, files)
       files.each do |file|
-        attach_file(application, file, file.descriptive_name)
+        opts = {
+          application_id: application['id'],
+          application_member_id: _short_form_pref_member_id(application, file),
+          application_preference_id: _short_form_pref_id(application, file),
+          file_id: file.id,
+        }
+        ShortFormAttachmentJob.perform_later(opts)
       end
     end
 
