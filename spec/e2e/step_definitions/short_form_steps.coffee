@@ -393,6 +393,12 @@ module.exports = ->
     ).first()
     @expect(workInSfPref.isPresent()).to.eventually.equal(true)
 
+  @Then 'I should see both the Live and Work in SF Preferences', ->
+    liveWorkInSfPref = element.all(By.model('liveWorkInSfPref')).filter((elem) ->
+      elem.isDisplayed()
+    ).first()
+    @expect(liveWorkInSfPref.isPresent()).to.eventually.equal(true)
+
   @Then 'I should see the Preferences Programs screen', ->
     certificateOfPreferenceLabel = element(By.cssContainingText('strong', 'Certificate of Preference (COP)'))
     @expect(certificateOfPreferenceLabel.isPresent()).to.eventually.equal(true)

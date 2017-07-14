@@ -60,6 +60,21 @@ Feature: Short Form Application - Live/Work Preference
       And I continue past the Lottery Preferences intro
       Then I should see the Work in SF Preference
 
+    Scenario: Both Live and Work preference appear if applicant or household member indicate that both are true
+      Given I go to the first page of the Test Listing application
+      When I fill out the Name page as "Frank Underwood"
+      And I fill out the Contact page with a non-SF address that works in SF
+      And I confirm my address
+      And I don't indicate an alternate contact
+      And I indicate living with other people
+      And I open the household member form
+      And I add an SF-based household member
+      And I confirm my address
+      And I indicate being done adding people
+      And I continue past the Lottery Preferences intro
+      And I opt out of NRHP preference
+      Then I should see both the Live and Work in SF Preferences
+
     Scenario: Opting in to live/work then saying no to workInSf then uploading proof
       Given I go to the first page of the Test Listing application
       When I fill out the Name page as "Jane Doe"
