@@ -42,16 +42,37 @@ fillOutContactPage = (opts = {}) ->
     element(By.id('workInSf_no')).click()
   submitPage()
 
-fillOutHouseholdMemberForm = (num = 0) ->
+fillOutHouseholdMemberFormSeries = (num = 0) ->
   firstNames = ['Jane', 'John', 'Jill', 'Jack', 'Jim', 'Jem', 'Jean']
-  firstName = firstNames[num]
-  element(By.model('householdMember.firstName')).clear().sendKeys(firstName)
-  element(By.model('householdMember.lastName')).clear().sendKeys('McPerson')
-  element(By.model('householdMember.dob_month')).clear().sendKeys('10')
-  element(By.model('householdMember.dob_day')).clear().sendKeys('15')
-  element(By.model('householdMember.dob_year')).clear().sendKeys('1985')
-  element(By.id('hasSameAddressAsApplicant_yes')).click()
-  element(By.id('workInSf_yes')).click()
+  fillOutHouseholdMemberForm({firstName: firstNames[num]})
+
+fillOutHouseholdMemberForm = (opts = {}) ->
+  opts.firstName ||= 'Claire'
+  opts.lastName ||= 'Underwood'
+  opts.dobMonth ||= '10'
+  opts.dobDay ||= '15'
+  opts.dobYear ||= '1985'
+  opts.hasSameAddressAsApplicant ||= 'yes'
+  opts.workInSf ||= 'yes'
+  opts.address1 ||= '123 Main St.'
+  opts.city ||= 'San Francisco'
+  element(By.model('householdMember.firstName')).clear().sendKeys(opts.firstName)
+  element(By.model('householdMember.lastName')).clear().sendKeys(opts.lastName)
+  element(By.model('householdMember.dob_month')).clear().sendKeys(opts.dobMonth)
+  element(By.model('householdMember.dob_day')).clear().sendKeys(opts.dobDay)
+  element(By.model('householdMember.dob_year')).clear().sendKeys(opts.dobYear)
+  if opts.hasSameAddressAsApplicant == 'yes'
+    element(By.id('hasSameAddressAsApplicant_yes')).click()
+  else
+    element(By.id('hasSameAddressAsApplicant_no')).click()
+    element(By.id('householdMember_home_address_address1')).clear().sendKeys(opts.address1)
+    element(By.id('householdMember_home_address_city')).clear().sendKeys(opts.city)
+    element(By.id('householdMember_home_address_state')).sendKeys('california')
+    element(By.id('householdMember_home_address_zip')).sendKeys('94066')
+  if opts.workInSf == 'yes'
+    element(By.id('workInSf_yes')).click()
+  else
+    element(By.id('workInSf_no')).click()
   element(By.model('householdMember.relationship')).sendKeys('Cousin')
   submitPage()
 
@@ -104,6 +125,9 @@ module.exports = ->
   @When 'I fill out the Contact page with a non-SF address', ->
     fillOutContactPage({email: janedoeEmail, address1: '1120 Mar West G', city: 'Tiburon', workInSf: 'no', zip: '94920'})
 
+  @When 'I fill out the Contact page with a non-SF address that works in SF', ->
+    fillOutContactPage({email: janedoeEmail, address1: '1120 Mar West G', city: 'Tiburon', zip: '94920'})
+
   @When 'I fill out the Contact page with an SF address', ->
     fillOutContactPage({email: janedoeEmail, workInSf: 'no'})
 
@@ -145,26 +169,17 @@ module.exports = ->
       elem.isDisplayed()
     ).last().click()
 
+  @When 'I add a non-SF household member who works in SF', ->
+    fillOutHouseholdMemberForm({hasSameAddressAsApplicant: 'no', address1: '1150 El Camino Real', city: 'San Bruno'})
+
   @When 'I add an SF-based household member', ->
-    element(By.model('householdMember.firstName')).clear().sendKeys('Claire')
-    element(By.model('householdMember.lastName')).clear().sendKeys('Underwood')
-    element(By.model('householdMember.dob_month')).clear().sendKeys('10')
-    element(By.model('householdMember.dob_day')).clear().sendKeys('15')
-    element(By.model('householdMember.dob_year')).clear().sendKeys('1985')
-    element(By.id('hasSameAddressAsApplicant_no')).click()
-    element(By.id('householdMember_home_address_address1')).clear().sendKeys('123 Main St.')
-    element(By.id('householdMember_home_address_city')).clear().sendKeys('San Francisco')
-    element(By.id('householdMember_home_address_state')).sendKeys('california')
-    element(By.id('householdMember_home_address_zip')).sendKeys('94121')
-    element(By.id('workInSf_no')).click()
-    element(By.model('householdMember.relationship')).sendKeys('Other')
-    submitPage()
+    fillOutHouseholdMemberForm({hasSameAddressAsApplicant: 'no', workInSf: 'no'})
 
   @When /^I add household member "([^"]*)"$/, (index) ->
     index = parseInt(index) - 1
     browser.waitForAngular()
     element(By.id('add-household-member')).click().then ->
-      fillOutHouseholdMemberForm(index)
+      fillOutHouseholdMemberFormSeries(index)
 
   @When 'I indicate being done adding people', ->
     submitPage()
@@ -360,17 +375,23 @@ module.exports = ->
   # --- Expectations --- #
   ########################
 
-  @Then 'I should not see the Live in SF Preference', ->
+  @Then 'I should not see either the Live in SF Preference or Work in SF Preference', ->
     certPref = element.all(By.model('noLifeWorkInSfPref')).filter((elem) ->
       elem.isDisplayed()
     ).first()
     @expect(certPref.isPresent()).to.eventually.equal(true)
 
   @Then 'I should see the Live in SF Preference', ->
-    liveInSfPref = element.all(By.model('liveWorkInSfPref')).filter((elem) ->
+    liveInSfPref = element.all(By.model('liveInSfPref')).filter((elem) ->
       elem.isDisplayed()
     ).first()
     @expect(liveInSfPref.isPresent()).to.eventually.equal(true)
+
+  @Then 'I should see the Work in SF Preference', ->
+    workInSfPref = element.all(By.model('workInSfPref')).filter((elem) ->
+      elem.isDisplayed()
+    ).first()
+    @expect(workInSfPref.isPresent()).to.eventually.equal(true)
 
   @Then 'I should see the Preferences Programs screen', ->
     certificateOfPreferenceLabel = element(By.cssContainingText('strong', 'Certificate of Preference (COP)'))
