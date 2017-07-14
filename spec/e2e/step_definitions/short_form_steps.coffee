@@ -26,14 +26,20 @@ fillOutNamePage = (fullName, opts = {}) ->
 
 fillOutContactPage = (opts = {}) ->
   opts.address1 ||= '4053 18th St.'
+  opts.city ||= 'San Francisco'
+  opts.zip ||= '94114'
+  opts.workInSf ||= 'yes'
   element(By.model('applicant.phone')).clear().sendKeys('2222222222')
   element(By.model('applicant.phoneType')).sendKeys('home')
   element(By.model('applicant.email')).clear().sendKeys(opts.email) if opts.email
   element(By.id('applicant_home_address_address1')).clear().sendKeys(opts.address1)
-  element(By.id('applicant_home_address_city')).clear().sendKeys('San Francisco')
+  element(By.id('applicant_home_address_city')).clear().sendKeys(opts.city)
   element(By.id('applicant_home_address_state')).sendKeys('california')
-  element(By.id('applicant_home_address_zip')).clear().sendKeys('94114')
-  element(By.id('workInSf_yes')).click()
+  element(By.id('applicant_home_address_zip')).clear().sendKeys(opts.zip)
+  if opts.workInSf == 'yes'
+    element(By.id('workInSf_yes')).click()
+  else if opts.workInSf == 'no'
+    element(By.id('workInSf_no')).click()
   submitPage()
 
 fillOutHouseholdMemberForm = (num = 0) ->
@@ -95,6 +101,12 @@ module.exports = ->
   @When 'I submit the Name page with my account info', ->
     submitPage()
 
+  @When 'I fill out the Contact page with a non-SF address', ->
+    fillOutContactPage({email: janedoeEmail, address1: '1120 Mar West G', city: 'Tiburon', workInSf: 'no', zip: '94920'})
+
+  @When 'I fill out the Contact page with an SF address', ->
+    fillOutContactPage({email: janedoeEmail})
+
   @When 'I fill out the Contact page with an address (non-NRHP match) and WorkInSF', ->
     fillOutContactPage({email: janedoeEmail})
 
@@ -119,6 +131,7 @@ module.exports = ->
     element(By.id('other-people')).click()
     # also skip past household-overview
     submitPage()
+    # submitPage()
 
   @When 'I open the household member form', ->
     element(By.id('add-household-member')).click()
@@ -131,6 +144,21 @@ module.exports = ->
     element.all(By.cssContainingText('.edit-link', 'Edit')).filter((elem) ->
       elem.isDisplayed()
     ).last().click()
+
+  @When 'I add an SF-based household member', ->
+    element(By.model('householdMember.firstName')).clear().sendKeys('Claire')
+    element(By.model('householdMember.lastName')).clear().sendKeys('Underwood')
+    element(By.model('householdMember.dob_month')).clear().sendKeys('10')
+    element(By.model('householdMember.dob_day')).clear().sendKeys('15')
+    element(By.model('householdMember.dob_year')).clear().sendKeys('1985')
+    element(By.id('hasSameAddressAsApplicant_no')).click()
+    element(By.id('householdMember_home_address_address1')).clear().sendKeys('123 Main St.')
+    element(By.id('householdMember_home_address_city')).clear().sendKeys('San Francisco')
+    element(By.id('householdMember_home_address_state')).sendKeys('california')
+    element(By.id('householdMember_home_address_zip')).sendKeys('94121')
+    element(By.id('workInSf_no')).click()
+    element(By.model('householdMember.relationship')).sendKeys('Other')
+    submitPage()
 
   @When /^I add household member "([^"]*)"$/, (index) ->
     index = parseInt(index) - 1
@@ -331,6 +359,18 @@ module.exports = ->
   ########################
   # --- Expectations --- #
   ########################
+
+  @Then 'I should not see the Live in SF Preference', ->
+    certPref = element.all(By.model('noLifeWorkInSfPref')).filter((elem) ->
+      elem.isDisplayed()
+    ).first()
+    @expect(certPref.isPresent()).to.eventually.equal(true)
+
+  @Then 'I should see the Live in SF Preference', ->
+    liveInSfPref = element.all(By.model('liveWorkInSfCard')).filter((elem) ->
+      elem.isDisplayed()
+    ).first()
+    @expect(liveInSfPref.isPresent()).to.eventually.equal(true)
 
   @Then 'I should see the Preferences Programs screen', ->
     certificateOfPreferenceLabel = element(By.cssContainingText('strong', 'Certificate of Preference (COP)'))
