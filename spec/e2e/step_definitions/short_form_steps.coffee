@@ -105,7 +105,7 @@ module.exports = ->
     fillOutContactPage({email: janedoeEmail, address1: '1120 Mar West G', city: 'Tiburon', workInSf: 'no', zip: '94920'})
 
   @When 'I fill out the Contact page with an SF address', ->
-    fillOutContactPage({email: janedoeEmail})
+    fillOutContactPage({email: janedoeEmail, workInSf: 'no'})
 
   @When 'I fill out the Contact page with an address (non-NRHP match) and WorkInSF', ->
     fillOutContactPage({email: janedoeEmail})
@@ -367,7 +367,7 @@ module.exports = ->
     @expect(certPref.isPresent()).to.eventually.equal(true)
 
   @Then 'I should see the Live in SF Preference', ->
-    liveInSfPref = element.all(By.model('liveWorkInSfCard')).filter((elem) ->
+    liveInSfPref = element.all(By.model('liveWorkInSfPref')).filter((elem) ->
       elem.isDisplayed()
     ).first()
     @expect(liveInSfPref.isPresent()).to.eventually.equal(true)
