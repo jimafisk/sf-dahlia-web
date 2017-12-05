@@ -85,3 +85,14 @@ angular.module('customFilters', [])
     return '' unless input.length
     list = if fieldName then  _.map(input, fieldName) else input
     _.replace(list.join(', '), /,(?!.*,)/, ' and')
+.filter 'translation', ['$translate', '$sce', ($translate, $sce) ->
+  (key, attrs) ->
+    # can take in attr values to interpolate: https://angular-translate.github.io/docs/#/guide/06_variable-replacement
+    translated = $translate.instant(key, attrs)
+    if translated == key
+      return $translate.instant(key, {}, null, 'en')
+    else
+      value = '<span class="notranslate">' + translated + '</span>'
+      return $sce.trustAsHtml(value)
+  ]
+

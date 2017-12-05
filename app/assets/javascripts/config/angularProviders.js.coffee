@@ -70,7 +70,7 @@
 @dahlia.config ['$translateProvider', ($translateProvider) ->
   $translateProvider
     .preferredLanguage('en')
-    .fallbackLanguage('en')
+    # .fallbackLanguage('en')
     .useSanitizeValueStrategy('sceParameters')
     .useLoader('assetPathLoader') # custom loader, see below
 ]

@@ -16,8 +16,7 @@ section.splash-message
       p.t-tiny.c-charcoal
         | {{'WELCOME.BROWSE_OTHER_RESOURCES_SPLASH_MESSAGE' | translate}}
     .medium-4.columns.small-only-text-center
-      a.button.radius.ghost-white.no-margin.expand ui-sref="dahlia.additional-resources"
-        | {{'WELCOME.ADDITIONAL_OPPORTUNITIES' | translate}}
+      a.button.radius.ghost-white.no-margin.expand ng-bind-html="'WELCOME.ADDITIONAL_OPPORTUNITIES' | translation" ui-sref="dahlia.additional-resources"
 
 section.splash-wells.row.collapse
   .medium-6.columns
